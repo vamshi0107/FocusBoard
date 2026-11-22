@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Plus, Bell, Calendar as CalendarIcon, User } from 'lucide-react';
+import { Menu, Plus, Calendar as CalendarIcon, User } from 'lucide-react';
 
 export default function Header({ 
   onOpenSidebar, 
@@ -58,16 +58,6 @@ export default function Header({
 
       {/* Right: Actions, Create Task & Candidate Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Notifications */}
-        <button
-          type="button"
-          className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors relative"
-          aria-label="Notifications"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white"></span>
-        </button>
-
         {/* New Task Button */}
         <button
           type="button"
