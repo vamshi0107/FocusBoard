@@ -1,13 +1,22 @@
 import React from 'react';
-import { Menu, Plus, Bell, Calendar as CalendarIcon } from 'lucide-react';
+import { Menu, Plus, Bell, Calendar as CalendarIcon, User } from 'lucide-react';
 
-export default function Header({ onOpenSidebar, onOpenCreateTask }) {
+export default function Header({ 
+  onOpenSidebar, 
+  onOpenCreateTask, 
+  onOpenProfile,
+  profile 
+}) {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   });
+
+  const initials = profile?.name 
+    ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'VR';
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
@@ -33,8 +42,9 @@ export default function Header({ onOpenSidebar, onOpenCreateTask }) {
         </div>
       </div>
 
-      {/* Right: Actions & Create Task Button */}
+      {/* Right: Actions, Create Task & Candidate Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Notifications */}
         <button
           type="button"
           className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors relative"
@@ -44,6 +54,7 @@ export default function Header({ onOpenSidebar, onOpenCreateTask }) {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white"></span>
         </button>
 
+        {/* New Task Button */}
         <button
           type="button"
           onClick={onOpenCreateTask}
@@ -51,8 +62,35 @@ export default function Header({ onOpenSidebar, onOpenCreateTask }) {
           aria-label="Create new task"
         >
           <Plus className="w-4 h-4" />
-          <span>New Task</span>
+          <span className="hidden xs:inline sm:inline">New Task</span>
         </button>
+
+        {/* Candidate Profile Avatar Button */}
+        <div className="pl-1 sm:pl-2 border-l border-slate-200 flex items-center">
+          <button
+            type="button"
+            onClick={onOpenProfile}
+            className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all text-left group"
+            aria-label="View Candidate Profile"
+            title="View Candidate Profile"
+          >
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
+                {initials}
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+            </div>
+
+            <div className="hidden md:block">
+              <p className="text-xs font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">
+                {profile?.name || 'Vamshi Raikanti'}
+              </p>
+              <p className="text-[10px] text-slate-400 font-medium leading-none">
+                Candidate
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
     </header>
   );

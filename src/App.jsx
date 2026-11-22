@@ -10,6 +10,7 @@ import TaskForm from './components/TaskForm';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import SettingsModal from './components/SettingsModal';
 import CalendarView from './components/CalendarView';
+import ProfileModal from './components/ProfileModal';
 import { sampleTasks, sampleDeletedTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
@@ -26,6 +27,18 @@ export default function App() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Candidate Profile State (Persisted in localStorage)
+  const [candidateProfile, setCandidateProfile] = useLocalStorage('focusboard_candidate_profile', {
+    name: 'Vamshi Raikanti',
+    role: 'Frontend Engineer Candidate',
+    email: 'rsaivamshi098@gmail.com',
+    github: 'https://github.com/vamshi0107',
+    portfolio: 'https://focusboard-kohl.vercel.app/',
+    bio: 'Frontend developer passionate about building high-performance, accessible, and responsive web applications using React, modern JavaScript, and Tailwind CSS.',
+    skills: ['React 19', 'JavaScript (ES6+)', 'Tailwind CSS v4', 'Vite', 'HTML5 & CSS3', 'Responsive UI/UX', 'LocalStorage API', 'Git & GitHub']
+  });
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -201,6 +214,8 @@ export default function App() {
         onClose={() => setIsSidebarOpen(false)}
         activeNav={activeNav}
         onNavClick={handleNavClick}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        profile={candidateProfile}
       />
 
       {/* Main Content Area */}
@@ -208,6 +223,8 @@ export default function App() {
         <Header 
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onOpenCreateTask={handleOpenCreateModal}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          profile={candidateProfile}
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
@@ -309,6 +326,14 @@ export default function App() {
         onResetToSampleTasks={handleResetToSampleTasks}
         onClearAllTasks={handleClearAllTasks}
         totalTasks={tasks.length}
+      />
+
+      {/* Candidate Profile Modal */}
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        profile={candidateProfile}
+        onSaveProfile={setCandidateProfile}
       />
     </div>
   );

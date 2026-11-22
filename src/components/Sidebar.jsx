@@ -6,14 +6,17 @@ import {
   BarChart3, 
   Settings, 
   Sparkles,
-  X
+  X,
+  User
 } from 'lucide-react';
 
 export default function Sidebar({ 
   isOpen, 
   onClose, 
   activeNav = 'Dashboard', 
-  onNavClick 
+  onNavClick,
+  onOpenProfile,
+  profile
 }) {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
@@ -28,6 +31,10 @@ export default function Sidebar({
       onNavClick(name);
     }
   };
+
+  const initials = profile?.name 
+    ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'VR';
 
   return (
     <>
@@ -97,17 +104,26 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* User Card / Footer */}
-        <div className="p-4 border-t border-slate-800 m-2 rounded-xl bg-slate-800/40">
+        {/* Clickable Candidate Profile Footer Card */}
+        <div 
+          onClick={onOpenProfile}
+          className="p-3 border-t border-slate-800 m-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 transition-all cursor-pointer group"
+          role="button"
+          tabIndex={0}
+          aria-label="Open Candidate Profile"
+          title="Click to view candidate profile"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-indigo-700 flex items-center justify-center font-semibold text-xs text-white">
-              FB
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-bold text-xs text-white shadow-xs group-hover:scale-105 transition-transform">
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-slate-200 truncate">Candidate Workspace</p>
+              <p className="text-xs font-bold text-slate-200 truncate group-hover:text-white">
+                {profile?.name || 'Vamshi Raikanti'}
+              </p>
               <p className="text-[10px] text-emerald-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-                Active Sprint
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                Candidate Profile
               </p>
             </div>
           </div>
