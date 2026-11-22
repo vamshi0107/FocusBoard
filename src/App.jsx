@@ -334,6 +334,7 @@ export default function App() {
         onClose={() => setIsProfileOpen(false)}
         profile={candidateProfile}
         onSaveProfile={setCandidateProfile}
+        stats={stats}
       />
     </div>
   );
