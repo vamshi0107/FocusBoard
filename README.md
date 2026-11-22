@@ -5,7 +5,7 @@ FocusBoard is a responsive, accessible task management dashboard built with Reac
 ---
 
 ## 🌐 Live Demo & Repository
-- **Live Hosted Application:** [https://focusboard.vercel.app](https://focusboard.vercel.app) *(Replace with your deployed Vercel/Netlify URL)*
+- **Live Hosted Application:** [https://focusboard-kohl.vercel.app/](https://focusboard-kohl.vercel.app/)
 - **GitHub Repository:** [https://github.com/vamshi0107/FocusBoard](https://github.com/vamshi0107/FocusBoard)
 
 ---
