@@ -204,6 +204,11 @@ export default function App() {
     setDeletedTasks([]);
   };
 
+  // Real-time clock greeting
+  const hour = new Date().getHours();
+  const greetingText = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greetingIcon = hour < 12 ? '☀️' : hour < 17 ? '🌤️' : '🌙';
+
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
       {/* Sidebar Navigation */}
@@ -245,8 +250,20 @@ export default function App() {
           ) : (
             /* Main Dashboard View */
             <>
-              {/* Section 1: Dashboard Statistics Cards (Analytics Section) */}
-              <div id="analytics-section">
+              {/* Section 1: Dashboard Welcome Banner & Statistics Cards */}
+              <div id="analytics-section" className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                      <span>{greetingText}, {candidateProfile?.name?.split(' ')[0] || 'Vamshi'}!</span>
+                      <span>{greetingIcon}</span>
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                      Welcome to your FocusBoard sprint workspace. Here is your overview for today.
+                    </p>
+                  </div>
+                </div>
+
                 <StatCard stats={stats} />
               </div>
 

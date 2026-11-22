@@ -18,6 +18,17 @@ export default function Header({
     ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : 'VR';
 
+  // Dynamic real-time clock greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return { text: 'Good morning', icon: '☀️' };
+    if (hour < 17) return { text: 'Good afternoon', icon: '🌤️' };
+    return { text: 'Good evening', icon: '🌙' };
+  };
+
+  const greeting = getGreeting();
+  const firstName = profile?.name ? profile.name.split(' ')[0] : 'Vamshi';
+
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
       {/* Left: Mobile Toggle & Page Greeting */}
@@ -32,12 +43,15 @@ export default function Header({
         </button>
 
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-slate-800 leading-tight">
-            Tasks Dashboard
+          <h2 className="text-base sm:text-lg font-bold text-slate-800 leading-tight flex items-center gap-1.5">
+            <span>{greeting.text}, {firstName}!</span>
+            <span className="text-sm">{greeting.icon}</span>
           </h2>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
             <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
             <span>{today}</span>
+            <span className="text-slate-300">·</span>
+            <span>FocusBoard Dashboard</span>
           </div>
         </div>
       </div>
