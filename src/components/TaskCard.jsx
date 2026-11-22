@@ -95,13 +95,13 @@ export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
         </div>
 
         {/* Task Title */}
-        <h4 className="text-base font-bold text-slate-800 leading-snug line-clamp-2">
+        <h4 className="text-base font-bold text-slate-800 leading-snug line-clamp-2 break-words">
           {title}
         </h4>
 
         {/* Task Description */}
         {description && (
-          <p className="text-xs sm:text-sm text-slate-500 mt-2 line-clamp-3 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-500 mt-2 line-clamp-3 leading-relaxed break-words">
             {description}
           </p>
         )}

@@ -54,7 +54,7 @@ export default function FilterTabs({
       </div>
 
       {/* Priority Dropdown & Reset */}
-      <div className="flex items-center gap-2 self-end md:self-auto">
+      <div className="flex items-center justify-between w-full md:w-auto gap-2">
         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
           <Filter className="w-3.5 h-3.5 text-slate-400" />
           <span>Priority:</span>
