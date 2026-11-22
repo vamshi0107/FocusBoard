@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 
 /**
  * useLocalStorage Hook
- * Handles browser-side task persistence across page reloads.
+ * Handles browser-side persistence across page reloads for both arrays (tasks) and objects (profile).
  * 
- * Note: Initial sample data is only injected on first visit.
- * If user deliberately empties the board, we preserve the empty state
- * rather than constantly overriding with sample data on refresh.
+ * Note: Initial default data is only injected on first visit.
+ * Saved edits and empty states are strictly preserved on refresh.
  */
 export function useLocalStorage(key, initialValue) {
   const [value, setValue] = useState(() => {
@@ -14,13 +13,12 @@ export function useLocalStorage(key, initialValue) {
       const item = window.localStorage.getItem(key);
       if (item !== null) {
         const parsed = JSON.parse(item);
-        // Ensure valid array format before using stored cache
-        if (Array.isArray(parsed)) {
+        // Validates that parsed data exists (supports both arrays and profile objects)
+        if (parsed !== null && parsed !== undefined) {
           return parsed;
         }
       }
     } catch (error) {
-      // Gracefully fall back to initial value if localStorage is blocked or corrupted
       console.warn(`[FocusBoard] Failed to read localStorage key "${key}":`, error);
     }
     return typeof initialValue === 'function' ? initialValue() : initialValue;
