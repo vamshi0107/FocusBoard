@@ -10,6 +10,8 @@ import TaskForm from './components/TaskForm';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import SettingsModal from './components/SettingsModal';
 import ProfileModal from './components/ProfileModal';
+import CalendarModal from './components/CalendarModal';
+import AnalyticsModal from './components/AnalyticsModal';
 import { sampleTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
@@ -26,6 +28,8 @@ export default function App() {
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
   // Candidate Profile State (Persisted in localStorage)
   const [candidateProfile, setCandidateProfile] = useLocalStorage('focusboard_candidate_profile', {
@@ -81,19 +85,20 @@ export default function App() {
 
   const isFiltered = searchQuery.trim() !== '' || selectedStatus !== 'All' || selectedPriority !== 'All';
 
-  // In-Page Smooth Scroll Navigation (Strict single dashboard scope)
+  // In-Page & Modal Navigation (Strict single dashboard scope)
   const handleNavClick = (navName) => {
     setActiveNav(navName);
     setIsSidebarOpen(false); // Close mobile drawer
 
     if (navName === 'Dashboard') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (navName === 'My Tasks' || navName === 'Calendar') {
+    } else if (navName === 'My Tasks') {
       const el = document.getElementById('tasks-section');
       el?.scrollIntoView({ behavior: 'smooth' });
     } else if (navName === 'Analytics') {
-      const el = document.getElementById('analytics-section');
-      el?.scrollIntoView({ behavior: 'smooth' });
+      setIsAnalyticsOpen(true);
+    } else if (navName === 'Calendar') {
+      setIsCalendarOpen(true);
     } else if (navName === 'Settings') {
       setIsSettingsOpen(true);
     }
@@ -274,6 +279,27 @@ export default function App() {
         onClose={() => setIsProfileOpen(false)}
         profile={candidateProfile}
         onSaveProfile={setCandidateProfile}
+        stats={stats}
+      />
+
+      {/* Calendar Modal (Single Dashboard Integration) */}
+      <CalendarModal
+        isOpen={isCalendarOpen}
+        onClose={() => {
+          setIsCalendarOpen(false);
+          setActiveNav('Dashboard');
+        }}
+        tasks={tasks}
+      />
+
+      {/* Analytics Modal (Single Dashboard Integration) */}
+      <AnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => {
+          setIsAnalyticsOpen(false);
+          setActiveNav('Dashboard');
+        }}
+        tasks={tasks}
         stats={stats}
       />
     </div>
