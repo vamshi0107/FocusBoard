@@ -262,6 +262,7 @@ export default function App() {
                 <TaskList
                   tasks={filteredTasks}
                   totalTasksCount={tasks.length}
+                  searchQuery={searchQuery}
                   onEdit={handleOpenEditModal}
                   onDelete={handleOpenDeleteModal}
                   onStatusChange={handleStatusChange}
