@@ -6,9 +6,7 @@ export const sampleTasks = [
     category: "Design",
     status: "Completed",
     priority: "High",
-    dueDate: "2026-11-20",
-    createdAt: "2026-11-18",
-    completedAt: "2026-11-20"
+    dueDate: "2026-11-20"
   },
   {
     id: "TASK-102",
@@ -17,9 +15,7 @@ export const sampleTasks = [
     category: "Development",
     status: "In progress",
     priority: "High",
-    dueDate: "2026-11-23",
-    createdAt: "2026-11-19",
-    completedAt: null
+    dueDate: "2026-11-23"
   },
   {
     id: "TASK-103",
@@ -28,9 +24,7 @@ export const sampleTasks = [
     category: "Development",
     status: "In progress",
     priority: "Medium",
-    dueDate: "2026-11-24",
-    createdAt: "2026-11-19",
-    completedAt: null
+    dueDate: "2026-11-24"
   },
   {
     id: "TASK-104",
@@ -39,9 +33,7 @@ export const sampleTasks = [
     category: "Testing",
     status: "To do",
     priority: "Medium",
-    dueDate: "2026-11-25",
-    createdAt: "2026-11-21",
-    completedAt: null
+    dueDate: "2026-11-25"
   },
   {
     id: "TASK-105",
@@ -50,9 +42,7 @@ export const sampleTasks = [
     category: "Development",
     status: "To do",
     priority: "Low",
-    dueDate: "2026-11-26",
-    createdAt: "2026-11-21",
-    completedAt: null
+    dueDate: "2026-11-26"
   },
   {
     id: "TASK-106",
@@ -61,23 +51,6 @@ export const sampleTasks = [
     category: "Research",
     status: "To do",
     priority: "Low",
-    dueDate: "2026-11-27",
-    createdAt: "2026-11-22",
-    completedAt: null
-  }
-];
-
-export const sampleDeletedTasks = [
-  {
-    id: "TASK-099",
-    title: "Draft Initial Wireframes & Layout Prototypes",
-    description: "Initial exploratory sketches archived after Figma specs were approved.",
-    category: "Design",
-    status: "Completed",
-    priority: "Low",
-    dueDate: "2026-11-17",
-    createdAt: "2026-11-15",
-    completedAt: "2026-11-17",
-    deletedAt: "2026-11-19"
+    dueDate: "2026-11-27"
   }
 ];

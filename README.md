@@ -57,13 +57,9 @@ The primary objective of **FocusBoard** is to provide an intuitive, high-perform
    - **Multiplicative AND Logic:** Search query, status tabs, and priority filters work together simultaneously (`Search ∩ Status ∩ Priority`).
 
 4. **3-Slide Focus Notes Productivity Carousel:**
-   - Interactive carousel featuring circular Previous/Next navigation, active slide counter (`FOCUS NOTES · X OF 3`), and clickable dot indicators with direct slide jumping.
+   - Interactive carousel featuring circular Previous/Next navigation, active slide counter (`FOCUS NOTES · X OF 3`), and clickable dot indicators with direct slide jumping. *(The only multi-slide functionality explicitly required).*
 
-5. **Task Lifecycle Calendar View:**
-   - Full monthly calendar tracking task creation (`createdAt`), completion (`completedAt`), and deletion history (`deletedAt`).
-   - Interactive day selection with an activity timeline drawer.
-
-6. **Browser Data Persistence (`localStorage`):**
+5. **Browser Data Persistence (`localStorage`):**
    - Automatically initializes with 6 diverse sample tasks if storage is empty.
    - Persists all additions, edits, status toggles, and deletions across page reloads without overwriting user data.
    - Includes a **Settings Modal** to easily test the 0-tasks empty state or reset back to the initial 6 sample tasks.
@@ -89,9 +85,9 @@ focusboard/
 │   │   ├── TaskForm.jsx           # Unified Create and Edit task modal with validation
 │   │   ├── DeleteConfirmModal.jsx # Deletion safety confirmation dialog
 │   │   ├── SettingsModal.jsx      # LocalStorage inspector, sample reset, and clear tools
-│   │   └── CalendarView.jsx       # Task lifecycle calendar (Created, Completed, Deleted)
+│   │   └── ProfileModal.jsx       # Candidate profile with task completion progress
 │   ├── data/
-│   │   └── sampleTasks.js         # Default 6 sample tasks and archived task history
+│   │   └── sampleTasks.js         # Default 6 sample tasks schema
 │   ├── hooks/
 │   │   └── useLocalStorage.js    # Custom React hook for robust localStorage synchronization
 │   ├── App.jsx                    # Root state coordinator and layout organizer

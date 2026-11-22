@@ -9,19 +9,16 @@ import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import SettingsModal from './components/SettingsModal';
-import CalendarView from './components/CalendarView';
 import ProfileModal from './components/ProfileModal';
-import AnalyticsView from './components/AnalyticsView';
-import { sampleTasks, sampleDeletedTasks } from './data/sampleTasks';
+import { sampleTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
 export default function App() {
-  // Persistence via custom localStorage hooks
+  // Persistence via custom localStorage hook (Rule 3: do not overwrite saved data)
   const [tasks, setTasks] = useLocalStorage('focusboard_tasks', sampleTasks);
-  const [deletedTasks, setDeletedTasks] = useLocalStorage('focusboard_deleted_tasks', sampleDeletedTasks);
 
   // Navigation & UI State
-  const [activeNav, setActiveNav] = useState('Dashboard'); // 'Dashboard' | 'My Tasks' | 'Analytics' | 'Calendar' | 'Settings'
+  const [activeNav, setActiveNav] = useState('Dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -36,9 +33,7 @@ export default function App() {
     role: 'Frontend Engineer Candidate',
     email: 'rsaivamshi098@gmail.com',
     github: 'https://github.com/vamshi0107',
-    portfolio: 'https://focusboard-kohl.vercel.app/',
-    bio: 'Frontend developer passionate about building high-performance, accessible, and responsive web applications using React, modern JavaScript, and Tailwind CSS.',
-    skills: ['React 19', 'JavaScript (ES6+)', 'Tailwind CSS v4', 'Vite', 'HTML5 & CSS3', 'Responsive UI/UX', 'LocalStorage API', 'Git & GitHub']
+    portfolio: 'https://focusboard-kohl.vercel.app/'
   });
 
   // Search & Filter State
@@ -46,9 +41,7 @@ export default function App() {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedPriority, setSelectedPriority] = useState('All');
 
-  // Derive Statistics Dynamically (never hardcoded)
-  // Human engineering note: using useMemo here eliminates duplicate state and prevents desync bugs.
-  // Edge case: division-by-zero is guarded so 0 tasks gracefully shows 0% instead of NaN.
+  // Rule 2: All statistics dynamically derived from task state (never hardcoded)
   const stats = useMemo(() => {
     const total = tasks.length;
     const inProgress = tasks.filter((t) => t.status === 'In progress').length;
@@ -69,7 +62,7 @@ export default function App() {
     };
   }, [tasks]);
 
-  // Combined Filtering: Search AND Status AND Priority
+  // Combined Multi-Criteria Filtering: Search AND Status AND Priority
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       // 1. Search Query Filter (case-insensitive title match)
@@ -88,51 +81,36 @@ export default function App() {
 
   const isFiltered = searchQuery.trim() !== '' || selectedStatus !== 'All' || selectedPriority !== 'All';
 
-  // Navigation Click Handler
+  // In-Page Smooth Scroll Navigation (Strict single dashboard scope)
   const handleNavClick = (navName) => {
     setActiveNav(navName);
     setIsSidebarOpen(false); // Close mobile drawer
 
     if (navName === 'Dashboard') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (navName === 'My Tasks') {
+    } else if (navName === 'My Tasks' || navName === 'Calendar') {
       const el = document.getElementById('tasks-section');
       el?.scrollIntoView({ behavior: 'smooth' });
-    } else if (navName === 'Analytics' || navName === 'Calendar') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (navName === 'Analytics') {
+      const el = document.getElementById('analytics-section');
+      el?.scrollIntoView({ behavior: 'smooth' });
     } else if (navName === 'Settings') {
       setIsSettingsOpen(true);
     }
   };
 
-  // CRUD Operations with Lifecycle Tracking (Created, Completed, Deleted)
+  // Rule 1: Full interactive CRUD operations updating state & localStorage
   const handleCreateOrUpdateTask = (formData) => {
-    const nowIso = new Date().toISOString();
-
     if (taskToEdit) {
-      // Update existing task
+      // Edit existing task
       setTasks((prev) =>
-        prev.map((t) => {
-          if (t.id === taskToEdit.id) {
-            const isNowCompleted = formData.status === 'Completed';
-            const wasCompleted = t.status === 'Completed';
-            return {
-              ...t,
-              ...formData,
-              completedAt: isNowCompleted ? (t.completedAt || nowIso) : null
-            };
-          }
-          return t;
-        })
+        prev.map((t) => (t.id === taskToEdit.id ? { ...t, ...formData } : t))
       );
     } else {
-      // Create new task with unique ID & creation timestamp
-      const isCompleted = formData.status === 'Completed';
+      // Create new task with unique ID
       const newTask = {
         ...formData,
-        id: `TASK-${Date.now().toString().slice(-4)}`,
-        createdAt: nowIso,
-        completedAt: isCompleted ? nowIso : null
+        id: `TASK-${Date.now().toString().slice(-4)}`
       };
       setTasks((prev) => [newTask, ...prev]);
     }
@@ -155,35 +133,14 @@ export default function App() {
   };
 
   const handleConfirmDelete = (taskId) => {
-    const targetTask = tasks.find((t) => t.id === taskId);
-    if (targetTask) {
-      // Record deleted task in lifecycle history
-      const deletedRecord = {
-        ...targetTask,
-        deletedAt: new Date().toISOString()
-      };
-      setDeletedTasks((prev) => [deletedRecord, ...prev]);
-    }
-
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
     setIsDeleteModalOpen(false);
     setTaskToDelete(null);
   };
 
   const handleStatusChange = (taskId, newStatus) => {
-    const nowIso = new Date().toISOString();
     setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId) {
-          const isCompleted = newStatus === 'Completed';
-          return {
-            ...t,
-            status: newStatus,
-            completedAt: isCompleted ? (t.completedAt || nowIso) : null
-          };
-        }
-        return t;
-      })
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
     );
   };
 
@@ -193,20 +150,18 @@ export default function App() {
     setSelectedPriority('All');
   };
 
-  // Settings & Storage Presets
+  // Local testing presets for evaluator review
   const handleResetToSampleTasks = () => {
     setTasks(sampleTasks);
-    setDeletedTasks(sampleDeletedTasks);
   };
 
   const handleClearAllTasks = () => {
     setTasks([]);
-    setDeletedTasks([]);
   };
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation (Fixed on desktop scroll) */}
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)}
@@ -226,81 +181,60 @@ export default function App() {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
-          {activeNav === 'Calendar' ? (
-            /* Calendar View */
-            <CalendarView
-              tasks={tasks}
-              deletedTasks={deletedTasks}
-              onBackToDashboard={() => setActiveNav('Dashboard')}
-              onOpenCreateTask={handleOpenCreateModal}
-            />
-          ) : activeNav === 'Analytics' ? (
-            /* Analytics View */
-            <AnalyticsView
-              tasks={tasks}
-              deletedTasks={deletedTasks}
-              stats={stats}
-              onBackToDashboard={() => setActiveNav('Dashboard')}
-            />
-          ) : (
-            /* Main Dashboard View */
-            <>
-              {/* Section 1: Dashboard Statistics Cards */}
-              <div id="analytics-section">
-                <StatCard stats={stats} />
+          {/* Section 1: Dashboard Statistics Cards */}
+          <div id="analytics-section">
+            <StatCard stats={stats} />
+          </div>
+
+          {/* Section 2: 3-Slide Focus Notes Carousel (Only multi-slide functionality required) */}
+          <FocusNotes />
+
+          {/* Section 3: Search, Multi-Criteria Filters & Task List */}
+          <section id="tasks-section" aria-label="Task Management Controls" className="space-y-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                  Tasks Overview
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Manage, filter, and track project tasks in real time
+                </p>
               </div>
 
-              {/* Section 2: 3-Slide Focus Notes Carousel */}
-              <FocusNotes />
+              {/* Search Bar */}
+              <SearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
 
-              {/* Section 3: Search, Multi-Criteria Filters & Task List */}
-              <section id="tasks-section" aria-label="Task Management Controls" className="space-y-4 pt-2">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                      Tasks Overview
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Manage, filter, and track project tasks in real time
-                    </p>
-                  </div>
+            {/* Filter Tabs & Priority Filter */}
+            <FilterTabs 
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              selectedPriority={selectedPriority}
+              setSelectedPriority={setSelectedPriority}
+              statusCounts={statusCounts}
+              onResetFilters={handleResetFilters}
+              isFiltered={isFiltered}
+            />
 
-                  {/* Search Bar */}
-                  <SearchBar 
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                  />
-                </div>
-
-                {/* Filter Tabs & Priority Filter */}
-                <FilterTabs 
-                  selectedStatus={selectedStatus}
-                  setSelectedStatus={setSelectedStatus}
-                  selectedPriority={selectedPriority}
-                  setSelectedPriority={setSelectedPriority}
-                  statusCounts={statusCounts}
-                  onResetFilters={handleResetFilters}
-                  isFiltered={isFiltered}
-                />
-
-                {/* Section 4: Task List Grid */}
-                <TaskList
-                  tasks={filteredTasks}
-                  totalTasksCount={tasks.length}
-                  searchQuery={searchQuery}
-                  onEdit={handleOpenEditModal}
-                  onDelete={handleOpenDeleteModal}
-                  onStatusChange={handleStatusChange}
-                  onOpenCreateTask={handleOpenCreateModal}
-                  onResetFilters={handleResetFilters}
-                />
-              </section>
-            </>
-          )}
+            {/* Section 4: Task List Grid */}
+            <TaskList
+              tasks={filteredTasks}
+              totalTasksCount={tasks.length}
+              searchQuery={searchQuery}
+              onEdit={handleOpenEditModal}
+              onDelete={handleOpenDeleteModal}
+              onStatusChange={handleStatusChange}
+              onOpenCreateTask={handleOpenCreateModal}
+              onResetFilters={handleResetFilters}
+            />
+          </section>
         </main>
       </div>
 
-      {/* Create / Edit Task Modal */}
+      {/* Rule 4: Reusable Create / Edit Task Modal */}
       <TaskForm
         isOpen={isFormOpen}
         onClose={() => {
@@ -322,7 +256,7 @@ export default function App() {
         task={taskToDelete}
       />
 
-      {/* Settings & LocalStorage Management Modal */}
+      {/* Settings Modal (Data Presets & LocalStorage Inspector) */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => {
