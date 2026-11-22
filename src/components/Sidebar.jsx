@@ -106,7 +106,10 @@ export default function Sidebar({
 
         {/* Clickable Candidate Profile Footer Card */}
         <div 
-          onClick={onOpenProfile}
+          onClick={() => {
+            if (onClose) onClose();
+            if (onOpenProfile) onOpenProfile();
+          }}
           className="p-3 border-t border-slate-800 m-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 transition-all cursor-pointer group"
           role="button"
           tabIndex={0}
