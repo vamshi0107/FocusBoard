@@ -11,6 +11,7 @@ import DeleteConfirmModal from './components/DeleteConfirmModal';
 import SettingsModal from './components/SettingsModal';
 import CalendarView from './components/CalendarView';
 import ProfileModal from './components/ProfileModal';
+import AnalyticsView from './components/AnalyticsView';
 import { sampleTasks, sampleDeletedTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
@@ -97,10 +98,7 @@ export default function App() {
     } else if (navName === 'My Tasks') {
       const el = document.getElementById('tasks-section');
       el?.scrollIntoView({ behavior: 'smooth' });
-    } else if (navName === 'Analytics') {
-      const el = document.getElementById('analytics-section');
-      el?.scrollIntoView({ behavior: 'smooth' });
-    } else if (navName === 'Calendar') {
+    } else if (navName === 'Analytics' || navName === 'Calendar') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (navName === 'Settings') {
       setIsSettingsOpen(true);
@@ -235,6 +233,14 @@ export default function App() {
               deletedTasks={deletedTasks}
               onBackToDashboard={() => setActiveNav('Dashboard')}
               onOpenCreateTask={handleOpenCreateModal}
+            />
+          ) : activeNav === 'Analytics' ? (
+            /* Analytics View */
+            <AnalyticsView
+              tasks={tasks}
+              deletedTasks={deletedTasks}
+              stats={stats}
+              onBackToDashboard={() => setActiveNav('Dashboard')}
             />
           ) : (
             /* Main Dashboard View */
