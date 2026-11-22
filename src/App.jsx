@@ -9,15 +9,17 @@ import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import SettingsModal from './components/SettingsModal';
-import { sampleTasks } from './data/sampleTasks';
+import CalendarView from './components/CalendarView';
+import { sampleTasks, sampleDeletedTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
 export default function App() {
-  // Persistence via custom localStorage hook
+  // Persistence via custom localStorage hooks
   const [tasks, setTasks] = useLocalStorage('focusboard_tasks', sampleTasks);
+  const [deletedTasks, setDeletedTasks] = useLocalStorage('focusboard_deleted_tasks', sampleDeletedTasks);
 
   // Navigation & UI State
-  const [activeNav, setActiveNav] = useState('Dashboard');
+  const [activeNav, setActiveNav] = useState('Dashboard'); // 'Dashboard' | 'My Tasks' | 'Analytics' | 'Calendar' | 'Settings'
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -77,29 +79,47 @@ export default function App() {
 
     if (navName === 'Dashboard') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (navName === 'My Tasks' || navName === 'Calendar') {
+    } else if (navName === 'My Tasks') {
       const el = document.getElementById('tasks-section');
       el?.scrollIntoView({ behavior: 'smooth' });
     } else if (navName === 'Analytics') {
       const el = document.getElementById('analytics-section');
       el?.scrollIntoView({ behavior: 'smooth' });
+    } else if (navName === 'Calendar') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (navName === 'Settings') {
       setIsSettingsOpen(true);
     }
   };
 
-  // CRUD Operations
+  // CRUD Operations with Lifecycle Tracking (Created, Completed, Deleted)
   const handleCreateOrUpdateTask = (formData) => {
+    const nowIso = new Date().toISOString();
+
     if (taskToEdit) {
       // Update existing task
       setTasks((prev) =>
-        prev.map((t) => (t.id === taskToEdit.id ? { ...t, ...formData } : t))
+        prev.map((t) => {
+          if (t.id === taskToEdit.id) {
+            const isNowCompleted = formData.status === 'Completed';
+            const wasCompleted = t.status === 'Completed';
+            return {
+              ...t,
+              ...formData,
+              completedAt: isNowCompleted ? (t.completedAt || nowIso) : null
+            };
+          }
+          return t;
+        })
       );
     } else {
-      // Create new task with unique ID
+      // Create new task with unique ID & creation timestamp
+      const isCompleted = formData.status === 'Completed';
       const newTask = {
         ...formData,
-        id: `TASK-${Date.now().toString().slice(-4)}`
+        id: `TASK-${Date.now().toString().slice(-4)}`,
+        createdAt: nowIso,
+        completedAt: isCompleted ? nowIso : null
       };
       setTasks((prev) => [newTask, ...prev]);
     }
@@ -122,14 +142,35 @@ export default function App() {
   };
 
   const handleConfirmDelete = (taskId) => {
+    const targetTask = tasks.find((t) => t.id === taskId);
+    if (targetTask) {
+      // Record deleted task in lifecycle history
+      const deletedRecord = {
+        ...targetTask,
+        deletedAt: new Date().toISOString()
+      };
+      setDeletedTasks((prev) => [deletedRecord, ...prev]);
+    }
+
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
     setIsDeleteModalOpen(false);
     setTaskToDelete(null);
   };
 
   const handleStatusChange = (taskId, newStatus) => {
+    const nowIso = new Date().toISOString();
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+      prev.map((t) => {
+        if (t.id === taskId) {
+          const isCompleted = newStatus === 'Completed';
+          return {
+            ...t,
+            status: newStatus,
+            completedAt: isCompleted ? (t.completedAt || nowIso) : null
+          };
+        }
+        return t;
+      })
     );
   };
 
@@ -142,10 +183,12 @@ export default function App() {
   // Settings & Storage Presets
   const handleResetToSampleTasks = () => {
     setTasks(sampleTasks);
+    setDeletedTasks(sampleDeletedTasks);
   };
 
   const handleClearAllTasks = () => {
     setTasks([]);
+    setDeletedTasks([]);
   };
 
   return (
@@ -166,55 +209,68 @@ export default function App() {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
-          {/* Section 1: Dashboard Statistics Cards (Analytics Section) */}
-          <div id="analytics-section">
-            <StatCard stats={stats} />
-          </div>
-
-          {/* Section 2: 3-Slide Focus Notes Carousel */}
-          <FocusNotes />
-
-          {/* Section 3: Search, Multi-Criteria Filters & Task List */}
-          <section id="tasks-section" aria-label="Task Management Controls" className="space-y-4 pt-2">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                  Tasks Overview
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Manage, filter, and track project tasks in real time
-                </p>
+          {activeNav === 'Calendar' ? (
+            /* Calendar View */
+            <CalendarView
+              tasks={tasks}
+              deletedTasks={deletedTasks}
+              onBackToDashboard={() => setActiveNav('Dashboard')}
+              onOpenCreateTask={handleOpenCreateModal}
+            />
+          ) : (
+            /* Main Dashboard View */
+            <>
+              {/* Section 1: Dashboard Statistics Cards (Analytics Section) */}
+              <div id="analytics-section">
+                <StatCard stats={stats} />
               </div>
 
-              {/* Search Bar */}
-              <SearchBar 
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
+              {/* Section 2: 3-Slide Focus Notes Carousel */}
+              <FocusNotes />
 
-            {/* Filter Tabs & Priority Filter */}
-            <FilterTabs 
-              selectedStatus={selectedStatus}
-              setSelectedStatus={setSelectedStatus}
-              selectedPriority={selectedPriority}
-              setSelectedPriority={setSelectedPriority}
-              statusCounts={statusCounts}
-              onResetFilters={handleResetFilters}
-              isFiltered={isFiltered}
-            />
+              {/* Section 3: Search, Multi-Criteria Filters & Task List */}
+              <section id="tasks-section" aria-label="Task Management Controls" className="space-y-4 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                      Tasks Overview
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Manage, filter, and track project tasks in real time
+                    </p>
+                  </div>
 
-            {/* Section 4: Task List Grid */}
-            <TaskList
-              tasks={filteredTasks}
-              totalTasksCount={tasks.length}
-              onEdit={handleOpenEditModal}
-              onDelete={handleOpenDeleteModal}
-              onStatusChange={handleStatusChange}
-              onOpenCreateTask={handleOpenCreateModal}
-              onResetFilters={handleResetFilters}
-            />
-          </section>
+                  {/* Search Bar */}
+                  <SearchBar 
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                  />
+                </div>
+
+                {/* Filter Tabs & Priority Filter */}
+                <FilterTabs 
+                  selectedStatus={selectedStatus}
+                  setSelectedStatus={setSelectedStatus}
+                  selectedPriority={selectedPriority}
+                  setSelectedPriority={setSelectedPriority}
+                  statusCounts={statusCounts}
+                  onResetFilters={handleResetFilters}
+                  isFiltered={isFiltered}
+                />
+
+                {/* Section 4: Task List Grid */}
+                <TaskList
+                  tasks={filteredTasks}
+                  totalTasksCount={tasks.length}
+                  onEdit={handleOpenEditModal}
+                  onDelete={handleOpenDeleteModal}
+                  onStatusChange={handleStatusChange}
+                  onOpenCreateTask={handleOpenCreateModal}
+                  onResetFilters={handleResetFilters}
+                />
+              </section>
+            </>
+          )}
         </main>
       </div>
 
