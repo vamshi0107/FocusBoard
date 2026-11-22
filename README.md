@@ -6,7 +6,7 @@ FocusBoard is a responsive, accessible task management dashboard built with Reac
 
 ## 🌐 Live Demo & Repository
 - **Live Hosted Application:** [https://focusboard.vercel.app](https://focusboard.vercel.app) *(Replace with your deployed Vercel/Netlify URL)*
-- **GitHub Repository:** [https://github.com/your-username/focusboard](https://github.com/your-username/focusboard) *(Replace with your GitHub repository URL)*
+- **GitHub Repository:** [https://github.com/vamshi0107/FocusBoard](https://github.com/vamshi0107/FocusBoard)
 
 ---
 
@@ -236,8 +236,8 @@ export function useLocalStorage(key, initialValue) {
 ### Installation Steps
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/focusboard.git
-   cd focusboard
+   git clone https://github.com/vamshi0107/FocusBoard.git
+   cd FocusBoard
    ```
 
 2. **Install project dependencies:**
