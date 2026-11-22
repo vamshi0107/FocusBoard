@@ -31,6 +31,8 @@ export default function FocusNotes() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Lightweight native carousel navigation:
+  // Circular index arithmetic avoids external library overhead (rejected Swiper/Embla per 24-hr scope).
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };

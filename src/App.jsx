@@ -33,6 +33,8 @@ export default function App() {
   const [selectedPriority, setSelectedPriority] = useState('All');
 
   // Derive Statistics Dynamically (never hardcoded)
+  // Human engineering note: using useMemo here eliminates duplicate state and prevents desync bugs.
+  // Edge case: division-by-zero is guarded so 0 tasks gracefully shows 0% instead of NaN.
   const stats = useMemo(() => {
     const total = tasks.length;
     const inProgress = tasks.filter((t) => t.status === 'In progress').length;

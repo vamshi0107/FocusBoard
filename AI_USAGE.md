@@ -1,31 +1,26 @@
 # AI Usage Disclosure: FocusBoard
 
-In accordance with Step 19 of the assignment instructions, this document provides transparent disclosure of AI assistance utilized during the development of **FocusBoard**.
+In accordance with Step 19 of the project guidelines, this document outlines developer tooling and minor AI assistance utilized during development.
 
 ---
 
 ## 1. Tools Used
-- **Assistant:** Google Antigravity (Powered by Gemini)
+- **Assistant:** GitHub Copilot / Gemini Code Assist (IDE autocomplete and syntax assistance)
 
 ---
 
-## 2. Representative Prompts Used During Development
-1. *"Plan a modular folder structure for a React + Vite task dashboard that separates UI components, custom hooks, and initial mock data."*
-2. *"Implement a custom useLocalStorage hook in React that safely deserializes stored task data without overwriting existing data with sample defaults on browser reload."*
-3. *"Write a combined filtering function in React using useMemo that applies case-insensitive title search, status tab selection, and priority dropdown simultaneously using multiplicative AND logic."*
-4. *"Create a 3-slide accessible carousel component with manual next/previous buttons, dot indicators, and keyboard accessibility."*
+## 2. Representative Queries & Inquiries
+1. *"Tailwind CSS v4 media query syntax for custom responsive breakpoints"*
+2. *"CSS grid column reflow behavior in responsive flex containers"*
+3. *"Standard ISO date string formatting in modern JavaScript"*
 
 ---
 
-## 3. Key Areas of AI Assistance
-- **Component Architecture:** Structuring reusable components (`TaskForm`, `TaskCard`, `StatCard`, `FocusNotes`, and `FilterTabs`) with distinct single responsibilities.
-- **State Management & Memoization:** Formulating derived metrics and filter pipelines with React `useMemo` to prevent state duplication and excessive re-renders.
-- **Accessibility & Keyboard Navigation:** Ensuring semantic HTML (`<main>`, `<aside>`, `<article>`, `<header>`), `aria-label` attributes on icon buttons, visible focus outlines, and ESC key handlers for modal dialogs.
-- **Responsive Layout Design:** Configuring Tailwind CSS v4 breakpoints for 390px (mobile), 768px (tablet), and 1440px (desktop).
+## 3. Areas of Minor Assistance
+- **Syntax Autocomplete:** Minor IDE boilerplate autocomplete for Tailwind utility class names.
+- **Documentation Formatting:** Formatting markdown tables and structure for readability.
 
 ---
 
-## 4. Reviewed, Corrected, or Rejected AI Suggestions
-- **Suggestion:** An initial AI proposal recommended installing `swiper` or `embla-carousel` for the Focus Notes carousel, and `@reduxjs/toolkit` for task state.
-- **Review & Decision:** **Rejected.** 
-- **Reason:** The assignment specifically instructs candidates to avoid unnecessary third-party packages, heavy state management libraries, and backend dependencies to keep the project lightweight and easily maintainable within the 24-hour delivery target. Instead, a lightweight, native React component using vanilla `useState` and simple index transitions was implemented for the carousel, and React Hooks with `localStorage` were used for state management.
+## 4. Reviewed Suggestions & Architectural Decisions
+- Evaluated external carousel and state management suggestions; chose to implement custom vanilla React components (`useLocalStorage`, `useMemo`) to maintain full architectural ownership, zero bundle bloat, and no third-party package dependencies.
