@@ -8,6 +8,7 @@ import FilterTabs from './components/FilterTabs';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import SettingsModal from './components/SettingsModal';
 import { sampleTasks } from './data/sampleTasks';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
@@ -15,12 +16,14 @@ export default function App() {
   // Persistence via custom localStorage hook
   const [tasks, setTasks] = useLocalStorage('focusboard_tasks', sampleTasks);
 
-  // UI & Navigation State
+  // Navigation & UI State
+  const [activeNav, setActiveNav] = useState('Dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,6 +69,24 @@ export default function App() {
   }, [tasks, searchQuery, selectedStatus, selectedPriority]);
 
   const isFiltered = searchQuery.trim() !== '' || selectedStatus !== 'All' || selectedPriority !== 'All';
+
+  // Navigation Click Handler
+  const handleNavClick = (navName) => {
+    setActiveNav(navName);
+    setIsSidebarOpen(false); // Close mobile drawer
+
+    if (navName === 'Dashboard') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (navName === 'My Tasks' || navName === 'Calendar') {
+      const el = document.getElementById('tasks-section');
+      el?.scrollIntoView({ behavior: 'smooth' });
+    } else if (navName === 'Analytics') {
+      const el = document.getElementById('analytics-section');
+      el?.scrollIntoView({ behavior: 'smooth' });
+    } else if (navName === 'Settings') {
+      setIsSettingsOpen(true);
+    }
+  };
 
   // CRUD Operations
   const handleCreateOrUpdateTask = (formData) => {
@@ -118,12 +139,23 @@ export default function App() {
     setSelectedPriority('All');
   };
 
+  // Settings & Storage Presets
+  const handleResetToSampleTasks = () => {
+    setTasks(sampleTasks);
+  };
+
+  const handleClearAllTasks = () => {
+    setTasks([]);
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
       {/* Sidebar Navigation */}
       <Sidebar 
         isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+        onClose={() => setIsSidebarOpen(false)}
+        activeNav={activeNav}
+        onNavClick={handleNavClick}
       />
 
       {/* Main Content Area */}
@@ -134,14 +166,16 @@ export default function App() {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
-          {/* Section 1: Dashboard Statistics Cards */}
-          <StatCard stats={stats} />
+          {/* Section 1: Dashboard Statistics Cards (Analytics Section) */}
+          <div id="analytics-section">
+            <StatCard stats={stats} />
+          </div>
 
           {/* Section 2: 3-Slide Focus Notes Carousel */}
           <FocusNotes />
 
-          {/* Section 3: Search & Multi-Criteria Filters */}
-          <section aria-label="Task Management Controls" className="space-y-3">
+          {/* Section 3: Search, Multi-Criteria Filters & Task List */}
+          <section id="tasks-section" aria-label="Task Management Controls" className="space-y-4 pt-2">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-lg font-bold text-slate-900 tracking-tight">
@@ -169,10 +203,8 @@ export default function App() {
               onResetFilters={handleResetFilters}
               isFiltered={isFiltered}
             />
-          </section>
 
-          {/* Section 4: Task List Grid */}
-          <section aria-label="Task Cards List">
+            {/* Section 4: Task List Grid */}
             <TaskList
               tasks={filteredTasks}
               totalTasksCount={tasks.length}
@@ -206,6 +238,18 @@ export default function App() {
         }}
         onConfirm={handleConfirmDelete}
         task={taskToDelete}
+      />
+
+      {/* Settings & LocalStorage Management Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => {
+          setIsSettingsOpen(false);
+          setActiveNav('Dashboard');
+        }}
+        onResetToSampleTasks={handleResetToSampleTasks}
+        onClearAllTasks={handleClearAllTasks}
+        totalTasks={tasks.length}
       />
     </div>
   );

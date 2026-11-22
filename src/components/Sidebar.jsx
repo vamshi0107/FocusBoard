@@ -9,14 +9,25 @@ import {
   X
 } from 'lucide-react';
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ 
+  isOpen, 
+  onClose, 
+  activeNav = 'Dashboard', 
+  onNavClick 
+}) {
   const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, active: true },
-    { name: 'My Tasks', icon: CheckSquare, active: false },
-    { name: 'Calendar', icon: Calendar, active: false },
-    { name: 'Analytics', icon: BarChart3, active: false },
-    { name: 'Settings', icon: Settings, active: false },
+    { name: 'Dashboard', icon: LayoutDashboard },
+    { name: 'My Tasks', icon: CheckSquare },
+    { name: 'Analytics', icon: BarChart3 },
+    { name: 'Calendar', icon: Calendar },
+    { name: 'Settings', icon: Settings },
   ];
+
+  const handleItemClick = (name) => {
+    if (onNavClick) {
+      onNavClick(name);
+    }
+  };
 
   return (
     <>
@@ -64,19 +75,21 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = activeNav === item.name;
             return (
               <button
                 key={item.name}
                 type="button"
+                onClick={() => handleItemClick(item.name)}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  item.active
+                  isActive
                     ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${item.active ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                 <span>{item.name}</span>
-                {item.active && (
+                {isActive && (
                   <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 )}
               </button>
